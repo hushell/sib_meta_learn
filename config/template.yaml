@@ -1,0 +1,26 @@
+# Few-shot dataset
+nClsEpisode: 5 # number of categories in each episode
+nSupport: 1 # number of samples per category in the support set
+nQuery: 15 # number of samples per category in the query set
+dataset: 'miniImageNet' # choices = ['miniImageNet', 'CUB', 'Cifar', 'tieredImageNet']
+
+# Network
+nStep: 3 
+nbIter: 40000 
+architecture: 'WRN_28_10'  # choices = ['WRN_28_10', 'ResNet12', 'Conv64_4']
+batchSize: 8 # number of episodes in each batch
+
+# Optimizer
+lr: 0.001 
+weightDecay: 5e-4 
+momentum: 0.9 
+
+# Training details
+expName: template
+seed: 100
+cuda: true
+resumeFeatPth : './ckpts/Cifar_WRN_60Epoch_50.943/netFeatBest51.572.pth'
+outDir: ''
+logDir: ''
+
+
