@@ -1,10 +1,12 @@
 import os
 import torch
 import torch.utils.data as data
-from torchvision import transforms
 import PIL.Image as Image
 import numpy as np
 import json
+
+from torchvision import transforms
+from torchvision.datasets import ImageFolder
 
 
 def PilLoaderRGB(imgPath) :
@@ -45,14 +47,18 @@ class EpisodeSampler():
         self.imgTensor = floatType(3, inputW, inputH)
 
     def getEpisode(self):
+        # labels {0, ..., nClsEpisode-1}
         for i in range(self.nClsEpisode) :
             self.labelSupport[i * self.nSupport : (i+1) * self.nSupport] = i
             self.labelQuery[i * self.nQuery : (i+1) * self.nQuery] = i
 
+        # select nClsEpisode from clsList
         clsEpisode = np.random.choice(self.clsList, self.nClsEpisode, replace=False)
         for i, cls in enumerate(clsEpisode) :
             clsPath = os.path.join(self.imgDir, cls)
             imgList = os.listdir(clsPath)
+
+            # in total nQuery+nSupport images from each class
             imgCls = np.random.choice(imgList, self.nQuery + self.nSupport, replace=False)
 
             for j in range(self.nSupport) :
@@ -78,7 +84,7 @@ class EpisodeSampler():
                 }
 
 
-class TrainSampler():
+class BatchSampler():
     r"""INPUT PARAMETERS:
         imgDir : image directory, each category is in a sub file;
         nClsEpisode : number of classes in each episode;
@@ -175,6 +181,12 @@ def ValLoader(episodeJson, imgDir, inputW, inputH, valTransform, useGPU) :
     dataloader = data.DataLoader(ValImageFolder(episodeJson, imgDir, inputW, inputH,
                                                 valTransform, useGPU),
                                  shuffle=False)
+    return dataloader
+
+
+def TrainLoader(batchSize, imgDir, trainTransform) :
+    dataloader = data.DataLoader(ImageFolder(imgDir, trainTransform),
+                                 batch_size=batchSize, shuffle=True, drop_last=True)
     return dataloader
 
 

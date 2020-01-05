@@ -66,6 +66,11 @@ def get_args():
         default=100,
         type=int,
         help='The random seed')
+    argparser.add_argument(
+        '--gpu',
+        default=0,
+        type=int,
+        help='GPU id')
     args = argparser.parse_args()
     return args
 
@@ -80,12 +85,13 @@ def get_config():
     else:
         raise Exception("Only .json and .yaml are supported!")
 
-    config.seed = args.seed
-    config.cacheDir = os.path.join("cache", '{}_{}'.format(config.exp_name, config.seed))
+    if not hasattr(config, 'seed'): config.seed = args.seed
+    config.gpu = args.gpu
+    config.cacheDir = os.path.join("cache", '{}_{}'.format(config.expName, config.seed))
     config.logDir = os.path.join(config.cacheDir, 'logs')
     config.outDir = os.path.join(config.cacheDir, 'outputs')
 
     # create the experiments dirs
-    createDirs([config.cacheDir, config.logDir, config.outDir])
+    create_dirs([config.cacheDir, config.logDir, config.outDir])
 
     return config

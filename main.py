@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import random
 import itertools
 import json
@@ -8,7 +9,7 @@ from algorithm import Algorithm
 from networks import get_featnet
 from sib import ClassifierSIB
 from dataset import dataset_setting
-from dataloader import TrainSampler, ValLoader, EpisodeSampler
+from dataloader import BatchSampler, ValLoader, EpisodeSampler
 from utils.config import get_config
 from utils.utils import get_logger, set_random_seed
 
@@ -24,7 +25,14 @@ logger = get_logger(args.logDir, args.expName)
 
 # fix random seed to reproduce results
 set_random_seed(args.seed)
-logger.info('Random seed: {:d}'.format(args.seed))
+logger.info('Start experiment with random seed: {:d}'.format(args.seed))
+logger.info(args)
+
+# GPU setup
+os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
+if args.gpu != '':
+    args.cuda = True
+device = torch.device('cuda' if args.cuda else 'cpu')
 
 #############################################################################################
 ## datasets
@@ -35,7 +43,7 @@ trainTransform, valTransform, inputW, inputH, \
 args.inputW = inputW
 args.inputH = inputH
 
-trainLoader = TrainSampler(imgDir = trainDir,
+trainLoader = BatchSampler(imgDir = trainDir,
                            nClsEpisode = args.nClsEpisode,
                            nSupport = args.nSupport,
                            nQuery = args.nQuery,
@@ -64,27 +72,29 @@ testLoader = EpisodeSampler(imgDir = testDir,
 
 #############################################################################################
 ## Networks
-netFeat = get_featnet(args.architecture, inputW, inputH)
-netSIB = ClassifierSIB(args.nClsEpisode, netFeat.nFeat, args.nStep)
+netFeat, args.nFeat = get_featnet(args.architecture, inputW, inputH)
+netSIB = ClassifierSIB(args.nClsEpisode, args.nFeat, args.nStep)
+netFeat = netFeat.to(device)
+netSIB = netSIB.to(device)
 
 ## Optimizer
 optimizer = torch.optim.SGD(itertools.chain(*[netSIB.parameters(),]),
-                                             args.lr,
-                                             momentum=args.momentum,
-                                             weight_decay=args.weightDecay,
-                                             nesterov=True)
+                            args.lr,
+                            momentum=args.momentum,
+                            weight_decay=args.weightDecay,
+                            nesterov=True)
 
 ## Loss
 criterion = nn.CrossEntropyLoss()
 
 ## Algorithm class
-alg = Algorithm(args, netFeat, netSIB, optimizer, criterion)
+alg = Algorithm(args, logger, netFeat, netSIB, optimizer, criterion)
 
 
 #############################################################################################
 ## main loop
-if args.mode == 'train':
-    bestAcc, lastAcc, history = alg.train(trainLoader, valLoader)
+if not args.ckptPth:
+    bestAcc, lastAcc, history = alg.train(trainLoader, valLoader, coeffGrad=args.coeffGrad)
 
     ## Finish training!!!
     msg = 'mv {} {}'.format(os.path.join(args.outDir, 'netSIBBest.pth'),
@@ -104,7 +114,6 @@ if args.mode == 'train':
     logger.info(msg)
     os.system(msg)
 
-elif args.mode == 'test':
-    mean, ci95 = alg.test(test_loader)
-    logger.info('Final Perf with 95% confidence intervals: {:.3f}%, {:.3f}%'.format(mean, ci95))
+## Testing
+mean, ci95 = alg.validate(testLoader, mode='test')
 

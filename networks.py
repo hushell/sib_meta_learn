@@ -41,8 +41,6 @@ class ConvNet_4_64(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-        self.nFeat = 64 * (inputH/2**4) * (inputW/2**4)
-
     def forward(self, x):
         out = self.conv_blocks(x)
         out = out.view(out.size(0),-1)
@@ -135,8 +133,6 @@ class WideResNet(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-        self.nFeat = self.nChannels
-
     def forward(self, x):
         out = self.conv1(x)
         out = self.block1(out)
@@ -216,12 +212,15 @@ class FeatExemplarAvgBlock(nn.Module):
         return weight_novel
 
 
-def get_featnet(architecture, inputW, inputH):
+def get_featnet(architecture, inputW=80, inputH=80):
     # if cifar dataset, the last 2 blocks of WRN should be without stride
     isCifar = (inputW == 32) or (inputH == 32)
     if architecture == 'WRN_28_10':
-        return WideResNet(28, 10, isCifar=isCifar)
+        net = WideResNet(28, 10, isCifar=isCifar)
+        return net, net.nChannels
+
     elif architecture == 'ConvNet_4_64':
-        return eval(architecture)(inputW, inputH)
+        return eval(architecture)(inputW, inputH), 64 * (inputH/2**4) * (inputW/2**4)
+
     else:
         raise ValueError('No such feature net available!')
