@@ -1,6 +1,6 @@
 # Few-shot dataset
 nClsEpisode: 5 # number of categories in each episode
-nSupport: 1 # number of samples per category in the support set
+nSupport: 5 # number of samples per category in the support set
 nQuery: 15 # number of samples per category in the query set
 dataset: 'miniImageNet' # choices = ['miniImageNet', 'CUB', 'Cifar', 'tieredImageNet']
 
@@ -18,10 +18,10 @@ momentum: 0.9
 # Training details
 expName: miniImageNet_1shot
 seed: 300
-gpu: '2'
+gpu: '1'
 #resumeFeatPth: './miniImageNet_WRN_60Epoch_63.620/netFeatBest64.653.pth'
 resumeFeatPth: ''./ckpts/miniImageNet_WRN_60Epoch/netFeatBest64.357.pth''
-ckptPth: '' #'cache/miniImageNet_1shot_100/outputs_73.924/netSIBBest73.924.pth'
+ckptPth: '' 
 outDir: ''
 logDir: ''
 coeffGrad: 0
