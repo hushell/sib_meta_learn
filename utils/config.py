@@ -62,6 +62,11 @@ def get_args():
         default='None',
         help='The Configuration file')
     argparser.add_argument(
+        '-k', '--steps',
+        default=3,
+        type=int,
+        help='The number of SIB steps')
+    argparser.add_argument(
         '-s', '--seed',
         default=100,
         type=int,
@@ -87,7 +92,8 @@ def get_config():
 
     if not hasattr(config, 'seed'): config.seed = args.seed
     config.gpu = args.gpu
-    config.cacheDir = os.path.join("cache", '{}_{}'.format(config.expName, config.seed))
+    config.nStep = args.steps
+    config.cacheDir = os.path.join("cache", '{}_K{}_seed{}'.format(config.expName, config.nStep, config.seed))
     config.logDir = os.path.join(config.cacheDir, 'logs')
     config.outDir = os.path.join(config.cacheDir, 'outputs')
 
