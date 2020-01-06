@@ -16,11 +16,10 @@ weightDecay: 0.0005 #5e-4
 momentum: 0.9 
 
 # Training details
-expName: miniImageNet_1shot
+expName: miniImageNet
 seed: 300
 gpu: '2'
-resumeFeatPth: './ckpts/netFeatBest64.653.pth'
-#resumeFeatPth: ''./ckpts/netFeatBest64.357.pth''
+resumeFeatPth: './ckpts/Mini-ImageNet/netFeatBest64.653.pth'
 ckptPth: '' #'cache/miniImageNet_1shot_100/outputs_73.924/netSIBBest73.924.pth'
 outDir: ''
 logDir: ''

@@ -93,7 +93,8 @@ def get_config():
     if not hasattr(config, 'seed'): config.seed = args.seed
     config.gpu = args.gpu
     config.nStep = args.steps
-    config.cacheDir = os.path.join("cache", '{}_K{}_seed{}'.format(config.expName, config.nStep, config.seed))
+    config.cacheDir = os.path.join("cache", '{}_{}shot_K{}_seed{}'.format(
+        config.expName, config.nSupport, config.nStep, config.seed))
     config.logDir = os.path.join(config.cacheDir, 'logs')
     config.outDir = os.path.join(config.cacheDir, 'outputs')
 
