@@ -19,7 +19,7 @@ momentum: 0.9
 expName: cifarfs_1shot
 seed: 100
 gpu: '1'
-resumeFeatPth : './ckpts/Cifar_WRN_60Epoch_58.580/netFeatBest62.561.pth'
+resumeFeatPth : './netFeatBest62.561.pth'
 ckptPth: '' 
 outDir: ''
 logDir: ''
