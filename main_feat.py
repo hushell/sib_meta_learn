@@ -104,7 +104,7 @@ class ClassifierTrain(nn.Module):
 
 class BaseTrainer:
     def __init__(self, trainLoader, valLoader, nbCls, nClsEpisode, nFeat,
-                 outDir, milestones=[50], cuda=False):
+                 outDir, milestones=[50], inputW=80, inputH=80, cuda=False):
 
         self.trainLoader = trainLoader
         self.valLoader = valLoader
@@ -114,7 +114,7 @@ class BaseTrainer:
             os.mkdir(self.outDir)
 
         # Define model
-        self.netFeat, nFeat = get_featnet('WRN_28_10')
+        self.netFeat, nFeat = get_featnet('WRN_28_10', inputW, inputH)
         self.netClassifier = ClassifierTrain(nbCls)
         self.netClassifierVal = ClassifierEval(nClsEpisode, nFeat)
 
@@ -321,6 +321,7 @@ milestones = [100] if args.dataset == 'CUB' else [50] # More epochs for CUB sinc
 
 baseModel = BaseTrainer(trainLoader, valLoader, nbCls,
                         args.nClsEpisode, args.nFeat, args.outDir, milestones,
+                        args.inputW, args.inputH,
                         args.cuda)
 
 ## Load pretrained model if there is
