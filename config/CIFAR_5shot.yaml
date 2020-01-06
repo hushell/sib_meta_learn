@@ -16,7 +16,7 @@ weightDecay: 0.0005 #5e-4
 momentum: 0.9 
 
 # Training details
-expName: cifarfs_1shot
+expName: cifarfs_5shot
 seed: 100
 gpu: '1'
 resumeFeatPth : './netFeatBest62.561.pth'
