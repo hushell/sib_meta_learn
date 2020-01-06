@@ -1,8 +1,19 @@
-# sib_meta_learn
+# sib_meta_learn(ICLR 2020)
 This repo contains the implementation of the *synthetic information bottleneck* algorithm for few-shot classification on Mini-ImageNet,
 which is described in the paper 
-[Empirical Bayes Transductive Meta-Learning with Synthetic Gradients](https://openreview.net/forum?id=Hkg-xgrYvH).
+[Empirical Bayes Transductive Meta-Learning with Synthetic Gradients (ICLR 2020)](https://openreview.net/forum?id=Hkg-xgrYvH).
 
+If our project is helpful for your research, please consider citing : 
+``` Bash
+@inproceedings{
+    Hu2020Empirical,
+    title={Empirical Bayes Transductive Meta-Learning with Synthetic Gradients},
+    author={Shell Xu Hu and Pablo Moreno and Yang Xiao and Xi Shen and Guillaume Obozinski and Neil Lawrence and Andreas Damianou},
+    booktitle={International Conference on Learning Representations},
+    year={2020},
+    url={https://openreview.net/forum?id=Hkg-xgrYvH}
+}
+```
 
 ## Authors of the code
 [Shell Xu Hu](http://hushell.github.io/), [Xi Shen](https://xishen0220.github.io/) and [Yang Xiao](https://youngxiao13.github.io/)
