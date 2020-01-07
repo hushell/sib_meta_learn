@@ -1,6 +1,6 @@
 # Synthetic information bottleneck for transductive meta-learning
 This repo contains the implementation of the *synthetic information bottleneck* algorithm for few-shot classification on Mini-ImageNet,
-which is used in the ICLR 2020 paper 
+which is used in our ICLR 2020 paper 
 [Empirical Bayes Transductive Meta-Learning with Synthetic Gradients](https://openreview.net/forum?id=Hkg-xgrYvH).
 
 If our code is helpful for your research, please consider citing: 
@@ -9,7 +9,7 @@ If our code is helpful for your research, please consider citing:
     Hu2020Empirical,
     title={Empirical Bayes Transductive Meta-Learning with Synthetic Gradients},
     author={Shell Xu Hu and Pablo Moreno and Yang Xiao and Xi Shen and Guillaume Obozinski and Neil Lawrence and Andreas Damianou},
-    booktitle={International Conference on Learning Representations},
+    booktitle={International Conference on Learning Representations (ICLR)},
     year={2020},
     url={https://openreview.net/forum?id=Hkg-xgrYvH}
 }
@@ -49,5 +49,5 @@ python main.py --config config/miniImageNet_1shot.yaml --seed 100 --gpu 0
 
 | Setup         | 5-way-1-shot  | 5-way-5-shot |
 | ------------- | -------------:| ------------:|
-| SIB (K=3)     | 70.159 +- 0.580% | |
-| SIB (K=5)     | | |
+| SIB (K=3)     | 70.159 ± 0.580% | |
+| SIB (K=5)     | 70.288 ± 0.606% ||
