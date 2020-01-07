@@ -1,9 +1,9 @@
-# sib_meta_learn(ICLR 2020)
+# Synthetic information bottleneck for transductive meta-learning
 This repo contains the implementation of the *synthetic information bottleneck* algorithm for few-shot classification on Mini-ImageNet,
-which is described in the paper 
-[Empirical Bayes Transductive Meta-Learning with Synthetic Gradients (ICLR 2020)](https://openreview.net/forum?id=Hkg-xgrYvH).
+which is used in the ICLR 2020 paper 
+[Empirical Bayes Transductive Meta-Learning with Synthetic Gradients](https://openreview.net/forum?id=Hkg-xgrYvH).
 
-If our project is helpful for your research, please consider citing : 
+If our code is helpful for your research, please consider citing: 
 ``` Bash
 @inproceedings{
     Hu2020Empirical,
@@ -45,3 +45,9 @@ python main_feat.py --outDir miniImageNet_WRN_60Epoch --cuda --dataset miniImage
 python main.py --config config/miniImageNet_1shot.yaml --seed 100 --gpu 0
 ```
 
+## Mini-ImageNet Results
+
+| Setup         | 5-way-1-shot  | 5-way-5-shot |
+| ------------- | -------------:| ------------:|
+| SIB (K=3)     | 70.159 +- 0.580% | |
+| SIB (K=5)     | | |
