@@ -90,7 +90,7 @@ def get_config():
     else:
         raise Exception("Only .json and .yaml are supported!")
 
-    if not hasattr(config, 'seed'): config.seed = args.seed
+    config.seed = args.seed
     config.gpu = args.gpu
     config.nStep = args.steps
     config.cacheDir = os.path.join("cache", '{}_{}shot_K{}_seed{}'.format(

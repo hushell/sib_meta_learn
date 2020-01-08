@@ -17,8 +17,6 @@ momentum: 0.9
 
 # Training details
 expName: miniImageNet
-seed: 300
-gpu: '1'
 resumeFeatPth: './ckpts/Mini-ImageNet/netFeatBest64.653.pth'
 ckptPth: '' 
 outDir: ''
