@@ -6,7 +6,7 @@ dataset: 'miniImageNet' # choices = ['miniImageNet', 'Cifar']
 
 # Network
 nStep: 3 
-nbIter: 40000 
+nbIter: 50000 
 architecture: 'WRN_28_10'  # choices = ['WRN_28_10', 'Conv64_4']
 batchSize: 8 # number of episodes in each batch
 
