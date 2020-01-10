@@ -1,4 +1,4 @@
-# Synthetic information bottleneck for transductive meta-learning
+# \[ICLR 2020\] Synthetic information bottleneck for transductive meta-learning
 This repo contains the implementation of the *synthetic information bottleneck* algorithm for few-shot classification on Mini-ImageNet,
 which is used in our ICLR 2020 paper 
 [Empirical Bayes Transductive Meta-Learning with Synthetic Gradients](https://openreview.net/forum?id=Hkg-xgrYvH).
