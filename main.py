@@ -115,5 +115,14 @@ if not args.ckptPth:
     os.system(msg)
 
 ## Testing
+print ('Testing model LAST...')
 mean, ci95 = alg.validate(testLoader, mode='test')
 
+print ('Testing model BEST...')
+param = torch.load(os.path.join('{}_{:.3f}'.format(args.outDir, bestAcc),
+                                'netSIBBest{:.3f}.pth'.format(bestAcc)))
+alg.netFeat.load_state_dict(param['netFeat'])
+alg.netSIB.load_state_dict(param['SIB'])
+msg = 'Loading networks from {}'.format(os.path.join('{}_{:.3f}'.format(args.outDir, bestAcc),
+                                                     'netSIBBest{:.3f}.pth'.format(bestAcc)))
+mean, ci95 = alg.validate(testLoader, mode='test')
