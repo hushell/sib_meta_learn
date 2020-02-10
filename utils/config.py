@@ -76,13 +76,19 @@ def get_args():
         default=0,
         type=int,
         help='GPU id')
+    argparser.add_argument(
+        '--test',
+        action='store_true',
+        help='whether test a ckpt')
     args = argparser.parse_args()
     return args
 
 def get_config():
+    # read manual args
     args = get_args()
     config_file = args.config
 
+    # load experimental configuration
     if config_file.endswith('json'):
         config, _ = get_config_from_json(config_file)
     elif config_file.endswith('yaml'):
@@ -90,15 +96,17 @@ def get_config():
     else:
         raise Exception("Only .json and .yaml are supported!")
 
+    # reset config from args
+    config.nStep = args.steps
     config.seed = args.seed
     config.gpu = args.gpu
-    config.nStep = args.steps
+    config.test = args.test
+
+    # create directories
     config.cacheDir = os.path.join("cache", '{}_{}shot_K{}_seed{}'.format(
         config.expName, config.nSupport, config.nStep, config.seed))
     config.logDir = os.path.join(config.cacheDir, 'logs')
     config.outDir = os.path.join(config.cacheDir, 'outputs')
-
-    # create the experiments dirs
     create_dirs([config.cacheDir, config.logDir, config.outDir])
 
     return config

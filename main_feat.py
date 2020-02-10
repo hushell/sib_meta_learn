@@ -299,9 +299,6 @@ trainTransform, valTransform, inputW, inputH, \
         trainDir, valDir, testDir, episodeJson, nbCls = \
         dataset_setting(args.dataset, 1)
 
-args.inputW = inputW
-args.inputH = inputH
-
 trainLoader = TrainLoader(args.batchSize, trainDir, trainTransform)
 valLoader = ValLoader(episodeJson, valDir, inputW, inputH, valTransform, args.cuda)
 
@@ -321,7 +318,7 @@ milestones = [100] if args.dataset == 'CUB' else [50] # More epochs for CUB sinc
 
 baseModel = BaseTrainer(trainLoader, valLoader, nbCls,
                         args.nClsEpisode, args.nFeat, args.outDir, milestones,
-                        args.inputW, args.inputH,
+                        inputW, inputH,
                         args.cuda)
 
 ## Load pretrained model if there is

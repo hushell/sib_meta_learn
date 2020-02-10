@@ -18,8 +18,6 @@ class Algorithm:
         self.outDir = args.outDir
         self.nFeat = args.nFeat
         self.batchSize = args.batchSize
-        self.inputH = args.inputH
-        self.inputW = args.inputW
         self.nEpisode = args.nEpisode
         self.logger = logger
         self.device = torch.device('cuda' if args.cuda else 'cpu')
@@ -35,18 +33,21 @@ class Algorithm:
             logger.info(msg)
 
         if args.ckptPth:
-            param = torch.load(args.ckptPth)
-            self.netFeat.load_state_dict(param['netFeat'])
-            self.netSIB.load_state_dict(param['SIB'])
-            msg = '\nLoading networks from {}'.format(args.ckptPth)
-            logger.info(msg)
+            self.load_ckpt(args.ckptPth)
 
-            lr = param['lr']
-            self.optimizer = torch.optim.SGD(itertools.chain(*[self.netSIB.parameters(),]),
-                                             lr,
-                                             momentum=args.momentum,
-                                             weight_decay=args.weightDecay,
-                                             nesterov=True)
+
+    def load_ckpt(self, ckptPth):
+        param = torch.load(ckptPth)
+        self.netFeat.load_state_dict(param['netFeat'])
+        self.netSIB.load_state_dict(param['SIB'])
+        lr = param['lr']
+        self.optimizer = torch.optim.SGD(itertools.chain(*[self.netSIB.parameters(),]),
+                                         lr,
+                                         momentum=args.momentum,
+                                         weight_decay=args.weightDecay,
+                                         nesterov=True)
+        msg = '\nLoading networks from {}'.format(ckptPth)
+        logger.info(msg)
 
 
     def compute_grad_loss(self, clsScore, QueryLabel):
@@ -105,10 +106,10 @@ class Algorithm:
                         SupportFeat.unsqueeze(0), QueryFeat.unsqueeze(0), SupportLabel.unsqueeze(0)
 
             clsScore = self.netSIB(lr, SupportFeat, SupportLabel, QueryFeat)
-            clsScore = clsScore.view(QueryFeat.size()[0] * QueryFeat.size()[1], -1)
+            clsScore = clsScore.view(QueryFeat.shape[0] * QueryFeat.shape[1], -1)
             QueryLabel = QueryLabel.view(-1)
             acc1 = accuracy(clsScore, QueryLabel, topk=(1,))
-            top1.update(acc1[0].item(), clsScore.size()[0])
+            top1.update(acc1[0].item(), clsScore.shape[0])
 
             msg = 'Top1: {:.3f}%'.format(top1.avg)
             progress_bar(batchIdx, nEpisode, msg)
@@ -137,12 +138,13 @@ class Algorithm:
             with torch.no_grad() :
                 SupportTensor, SupportLabel, QueryTensor, QueryLabel = \
                         data['SupportTensor'], data['SupportLabel'], data['QueryTensor'], data['QueryLabel']
+                nC, nH, nW = SupportTensor.shape[2:]
 
-                SupportFeat = self.netFeat(SupportTensor.contiguous().view(-1, 3, self.inputW, self.inputH))
-                QueryFeat = self.netFeat(QueryTensor.contiguous().view(-1, 3, self.inputW, self.inputH))
+                SupportFeat = self.netFeat(SupportTensor.reshape(-1, nC, nH, nW))
+                SupportFeat = SupportFeat.view(self.batchSize, -1, self.nFeat)
 
-                SupportFeat, QueryFeat = SupportFeat.contiguous().view(self.batchSize, -1, self.nFeat), \
-                        QueryFeat.view(self.batchSize, -1, self.nFeat)
+                QueryFeat = self.netFeat(QueryTensor.reshape(-1, nC, nH, nW))
+                QueryFeat = QueryFeat.view(self.batchSize, -1, self.nFeat)
 
             if lr is None:
                 lr = self.optimizer.param_groups[0]['lr']
@@ -150,7 +152,7 @@ class Algorithm:
             self.optimizer.zero_grad()
 
             clsScore = self.netSIB(lr, SupportFeat, SupportLabel, QueryFeat)
-            clsScore = clsScore.view(QueryFeat.size()[0] * QueryFeat.size()[1], -1)
+            clsScore = clsScore.view(QueryFeat.shape[0] * QueryFeat.shape[1], -1)
             QueryLabel = QueryLabel.view(-1)
 
             if coeffGrad > 0:
@@ -163,8 +165,8 @@ class Algorithm:
             self.optimizer.step()
 
             acc1 = accuracy(clsScore, QueryLabel, topk=(1, ))
-            top1.update(acc1[0].item(), clsScore.size()[0])
-            losses.update(loss.item(), QueryFeat.size()[1])
+            top1.update(acc1[0].item(), clsScore.shape[0])
+            losses.update(loss.item(), QueryFeat.shape[1])
             msg = 'Loss: {:.3f} | Top1: {:.3f}% '.format(losses.avg, top1.avg)
             if coeffGrad > 0:
                 msg = msg + '| gradLoss: {:.3f}%'.format(gradLoss.item())

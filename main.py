@@ -17,13 +17,13 @@ torch.backends.cudnn.benchmark = True
 torch.backends.cudnn.enabled = True
 
 #############################################################################################
-## hyper-parameters
+## Read hyper-parameters
 args = get_config()
 
-# logging to the file and stdout
+# Setup logging to file and stdout
 logger = get_logger(args.logDir, args.expName)
 
-# fix random seed to reproduce results
+# Fix random seed to reproduce results
 set_random_seed(args.seed)
 logger.info('Start experiment with random seed: {:d}'.format(args.seed))
 logger.info(args)
@@ -35,13 +35,10 @@ if args.gpu != '':
 device = torch.device('cuda' if args.cuda else 'cpu')
 
 #############################################################################################
-## datasets
+## Datasets
 trainTransform, valTransform, inputW, inputH, \
         trainDir, valDir, testDir, episodeJson, nbCls = \
         dataset_setting(args.dataset, args.nSupport)
-
-args.inputW = inputW
-args.inputH = inputH
 
 trainLoader = BatchSampler(imgDir = trainDir,
                            nClsEpisode = args.nClsEpisode,
@@ -73,8 +70,8 @@ testLoader = EpisodeSampler(imgDir = testDir,
 #############################################################################################
 ## Networks
 netFeat, args.nFeat = get_featnet(args.architecture, inputW, inputH)
-netSIB = ClassifierSIB(args.nClsEpisode, args.nFeat, args.nStep)
 netFeat = netFeat.to(device)
+netSIB = ClassifierSIB(args.nClsEpisode, args.nFeat, args.nStep)
 netSIB = netSIB.to(device)
 
 ## Optimizer
@@ -92,8 +89,8 @@ alg = Algorithm(args, logger, netFeat, netSIB, optimizer, criterion)
 
 
 #############################################################################################
-## main loop
-if not args.ckptPth:
+## Training
+if not args.test:
     bestAcc, lastAcc, history = alg.train(trainLoader, valLoader, coeffGrad=args.coeffGrad)
 
     ## Finish training!!!
@@ -114,15 +111,14 @@ if not args.ckptPth:
     logger.info(msg)
     os.system(msg)
 
+
+#############################################################################################
 ## Testing
-print ('Testing model LAST...')
+print ('Testing model {}...'.format(args.ckptPth if args.test else 'LAST'))
 mean, ci95 = alg.validate(testLoader, mode='test')
 
-print ('Testing model BEST...')
-param = torch.load(os.path.join('{}_{:.3f}'.format(args.outDir, bestAcc),
-                                'netSIBBest{:.3f}.pth'.format(bestAcc)))
-alg.netFeat.load_state_dict(param['netFeat'])
-alg.netSIB.load_state_dict(param['SIB'])
-msg = 'Loading networks from {}'.format(os.path.join('{}_{:.3f}'.format(args.outDir, bestAcc),
-                                                     'netSIBBest{:.3f}.pth'.format(bestAcc)))
-mean, ci95 = alg.validate(testLoader, mode='test')
+if not args.test:
+    print ('Testing model BEST...')
+    alg.load_ckpt(os.path.join('{}_{:.3f}'.format(args.outDir, bestAcc),
+                               'netSIBBest{:.3f}.pth'.format(bestAcc)))
+    mean, ci95 = alg.validate(testLoader, mode='test')
