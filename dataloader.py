@@ -1,3 +1,17 @@
+# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+#   Licensed under the Apache License, Version 2.0 (the "License").
+#   You may not use this file except in compliance with the License.
+#   A copy of the License is located at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   or in the "license" file accompanying this file. This file is distributed
+#   on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+#   express or implied. See the License for the specific language governing
+#   permissions and limitations under the License.
+# ==============================================================================
+
 import os
 import torch
 import torch.utils.data as data
@@ -14,20 +28,18 @@ def PilLoaderRGB(imgPath) :
 
 
 class EpisodeSampler():
-    r"""INPUT PARAMETERS:
-        imgDir : image directory, each category is in a sub file;
-        nClsEpisode : number of classes in each episode;
-        nSupport : number of samples / category in the support set;
-        nQuery : number of samples / category in the query set;
-        transform : image transformation / data augmentation;
-        useGPU : use gpu or not;
-        inputW : input image size, dimension W;
-        inputH : input image size, dimension H;
+    """
+    Dataloader to sample a task/episode.
+    In case of 5-way 1-shot: nSupport = 1, nClsEpisode = 5.
 
-        In case of 5-way 1-shot: nSupport = 1, nClsEpisode = 5.
-
-    OUTPUT:
-        a dictionary of 1 episode data
+    :param string imgDir: image directory, each category is in a sub file;
+    :param int nClsEpisode: number of classes in each episode;
+    :param int nSupport: number of support examples;
+    :param int nQuery: number of query examples;
+    :param transform: image transformation/data augmentation;
+    :param bool useGPU: whether to use gpu or not;
+    :param int inputW: input image size, dimension W;
+    :param int inputH: input image size, dimension H;
     """
     def __init__(self, imgDir, nClsEpisode, nSupport, nQuery, transform, useGPU, inputW, inputH):
         self.imgDir = imgDir
@@ -47,6 +59,14 @@ class EpisodeSampler():
         self.imgTensor = floatType(3, inputW, inputH)
 
     def getEpisode(self):
+        """
+        Return an episode
+
+        :return dict: {'SupportTensor': 1 x nSupport x 3 x H x W,
+                       'SupportLabel': 1 x nSupport,
+                       'QueryTensor': 1 x nQuery x 3 x H x W,
+                       'QueryLabel': 1 x nQuery}
+        """
         # labels {0, ..., nClsEpisode-1}
         for i in range(self.nClsEpisode) :
             self.labelSupport[i * self.nSupport : (i+1) * self.nSupport] = i
@@ -85,21 +105,19 @@ class EpisodeSampler():
 
 
 class BatchSampler():
-    r"""INPUT PARAMETERS:
-        imgDir : image directory, each category is in a sub file;
-        nClsEpisode : number of classes in each episode;
-        nSupport : number of samples / category in the support set;
-        nQuery : number of samples / category in the query set;
-        transform : image transformation / data augmentation;
-        useGPU : use gpu or not;
-        inputW : input image size, dimension W;
-        inputH : input image size, dimension H;
+    """
+    Dataloader to sample a task/episode.
+    In case of 5-way 1-shot: nSupport = 1, nClsEpisode = 5.
 
-        batchSize : batch size (number of episode in each batch)
-        In case of 5-way 1-shot: nSupport = 1, nClsEpisode = 5.
-
-    OUTPUT:
-        a dictionary of 1 episode data
+    :param string imgDir: image directory, each category is in a sub file;
+    :param int nClsEpisode: number of classes in each episode;
+    :param int nSupport: number of support examples;
+    :param int nQuery: number of query examples;
+    :param transform: image transformation/data augmentation;
+    :param bool useGPU: whether to use gpu or not;
+    :param int inputW: input image size, dimension W;
+    :param int inputH: input image size, dimension H;
+    :param int batchSize: batch size (number of episode in each batch).
     """
     def __init__(self, imgDir, nClsEpisode, nSupport, nQuery, transform, useGPU, inputW, inputH, batchSize):
         self.episodeSampler = EpisodeSampler(imgDir, nClsEpisode, nSupport, nQuery,
@@ -116,6 +134,14 @@ class BatchSampler():
         self.batchSize = batchSize
 
     def getBatch(self):
+        """
+        Return an episode
+
+        :return dict: {'SupportTensor': B x nSupport x 3 x H x W,
+                       'SupportLabel': B x nSupport,
+                       'QueryTensor': B x nQuery x 3 x H x W,
+                       'QueryLabel': B x nQuery}
+        """
         for i in range(self.batchSize) :
             episode = self.episodeSampler.getEpisode()
             self.tensorSupport[i] = episode['SupportTensor']
@@ -131,6 +157,16 @@ class BatchSampler():
 
 
 class ValImageFolder(data.Dataset):
+    """
+    To make validation results comparable, we fix 2000 episodes for validation.
+
+    :param string episodeJson: ./data/Dataset/val1000Episode_K_way_N_shot.json
+    :param string imgDir: image directory, each category is in a sub file;
+    :param int inputW: input image size, dimension W;
+    :param int inputH: input image size, dimension H;
+    :param valTransform: image transformation/data augmentation;
+    :param bool useGPU: whether to use gpu or not;
+    """
     def __init__(self, episodeJson, imgDir, inputW, inputH, valTransform, useGPU):
         with open(episodeJson, 'r') as f :
             self.episodeInfo = json.load(f)
@@ -156,6 +192,15 @@ class ValImageFolder(data.Dataset):
 
 
     def __getitem__(self, index):
+        """
+        Return an episode
+
+        :param int index: index of data example
+        :return dict: {'SupportTensor': 1 x nSupport x 3 x H x W,
+                       'SupportLabel': 1 x nSupport,
+                       'QueryTensor': 1 x nQuery x 3 x H x W,
+                       'QueryLabel': 1 x nQuery}
+        """
         for i in range(self.nClsEpisode) :
             for j in range(self.nSupport) :
                 imgPath = os.path.join(self.imgDir, self.episodeInfo[index]['Support'][i][j])
@@ -174,6 +219,9 @@ class ValImageFolder(data.Dataset):
                 }
 
     def __len__(self):
+        """
+        Number of episodes
+        """
         return self.nEpisode
 
 

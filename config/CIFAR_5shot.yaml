@@ -19,7 +19,7 @@ expName: cifar-fs
 nbIter: 50000 # number of training iterations
 seed: 100 # can be reset with --seed
 gpu: '1' # can be reset with --gpu
-resumeFeatPth : './ckpts/Cifar/netFeatBest62.561.pth' # feat ckpt
+resumeFeatPth : './ckpts/CIFAR-FS/netFeatBest62.561.pth' # feat ckpt
 ckptPth: ''  # model ckpt for finetuning
 coeffGrad: 0 # grad loss coeff
 

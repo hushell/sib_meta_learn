@@ -1,3 +1,17 @@
+# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+#   Licensed under the Apache License, Version 2.0 (the "License").
+#   You may not use this file except in compliance with the License.
+#   A copy of the License is located at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   or in the "license" file accompanying this file. This file is distributed
+#   on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+#   express or implied. See the License for the specific language governing
+#   permissions and limitations under the License.
+# ==============================================================================
+
 '''Some helper functions for PyTorch, including:
     - get_mean_and_std: calculate the mean and std value of dataset.
     - msr_init: net parameter initialization.
@@ -31,8 +45,6 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 
-
-
 def getCi(accLog):
 
     mean = np.mean(accLog)
@@ -40,7 +52,6 @@ def getCi(accLog):
     ci95 = 1.96*std/np.sqrt(len(accLog))
 
     return mean, ci95
-
 
 
 def accuracy(output, target, topk=(1,)):
@@ -60,7 +71,6 @@ def accuracy(output, target, topk=(1,)):
         return res
 
 
-
 def get_mean_and_std(dataset):
     '''Compute the mean and std value of dataset.'''
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=2)
@@ -74,6 +84,7 @@ def get_mean_and_std(dataset):
     mean.div_(len(dataset))
     std.div_(len(dataset))
     return mean, std
+
 
 def init_params(net):
     '''Init layer parameters.'''
@@ -97,6 +108,8 @@ term_width = int(term_width)
 TOTAL_BAR_LENGTH = 65.
 last_time = time.time()
 begin_time = last_time
+
+
 def progress_bar(current, total, msg=None):
     global last_time, begin_time
     if current == 0:
@@ -139,6 +152,7 @@ def progress_bar(current, total, msg=None):
     else:
         sys.stdout.write('\n')
     sys.stdout.flush()
+
 
 def format_time(seconds):
     days = int(seconds / 3600/24)

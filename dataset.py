@@ -1,9 +1,27 @@
-## settings of different datasets
+# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+#   Licensed under the Apache License, Version 2.0 (the "License").
+#   You may not use this file except in compliance with the License.
+#   A copy of the License is located at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   or in the "license" file accompanying this file. This file is distributed
+#   on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+#   express or implied. See the License for the specific language governing
+#   permissions and limitations under the License.
+# ==============================================================================
+
 import numpy as np
 import torchvision.transforms as transforms
 
 def dataset_setting(dataset, nSupport):
+    """
+    Return dataset setting
 
+    :param string dataset: name of dataset
+    :param int nSupport: number of support examples
+    """
     if dataset == 'miniImageNet':
         mean = [x/255.0 for x in [120.39586422,  115.59361427, 104.54012653]]
         std = [x/255.0 for x in [70.68188272,  68.27635443,  72.54505529]]

@@ -1,3 +1,17 @@
+# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+#   Licensed under the Apache License, Version 2.0 (the "License").
+#   You may not use this file except in compliance with the License.
+#   A copy of the License is located at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   or in the "license" file accompanying this file. This file is distributed
+#   on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+#   express or implied. See the License for the specific language governing
+#   permissions and limitations under the License.
+# ==============================================================================
+
 import os
 import itertools
 import torch
@@ -7,6 +21,21 @@ from utils.outils import progress_bar, AverageMeter, accuracy, getCi
 from utils.utils import to_device
 
 class Algorithm:
+    """
+    Algorithm logic is implemented here with training and validation functions etc.
+
+    :param args: experimental configurations
+    :type args: EasyDict
+    :param logger: logger
+    :param netFeat: feature network
+    :type netFeat: class `WideResNet` or `ConvNet_4_64`
+    :param netSIB: Classifier/decoder
+    :type netSIB: class `ClassifierSIB`
+    :param optimizer: optimizer
+    :type optimizer: torch.optim.SGD
+    :param criterion: loss
+    :type criterion: nn.CrossEntropyLoss
+    """
     def __init__(self, args, logger, netFeat, netSIB, optimizer, criterion):
         self.netFeat = netFeat
         self.netSIB = netSIB
@@ -37,6 +66,12 @@ class Algorithm:
 
 
     def load_ckpt(self, ckptPth):
+        """
+        Load checkpoint from ckptPth.
+
+        :param ckptPth: the path to the ckpt
+        :type ckptPth: string
+        """
         param = torch.load(ckptPth)
         self.netFeat.load_state_dict(param['netFeat'])
         self.netSIB.load_state_dict(param['SIB'])
@@ -51,6 +86,9 @@ class Algorithm:
 
 
     def compute_grad_loss(self, clsScore, QueryLabel):
+        """
+        Compute the loss between true gradients and synthetic gradients.
+        """
         # register hooks
         def require_nonleaf_grad(v):
             def hook(g):
@@ -72,6 +110,14 @@ class Algorithm:
 
 
     def validate(self, valLoader, lr=None, mode='val'):
+        """
+        Run one epoch on val-set.
+
+        :param valLoader: the dataloader of val-set
+        :type valLoader: class `ValLoader`
+        :param float lr: learning rate for synthetic GD
+        :param string mode: 'val' or 'train'
+        """
         if mode == 'test':
             nEpisode = self.nEpisode
             self.logger.info('\n\nTest mode: randomly sample {:d} episodes...'.format(nEpisode))
@@ -105,7 +151,7 @@ class Algorithm:
                 SupportFeat, QueryFeat, SupportLabel = \
                         SupportFeat.unsqueeze(0), QueryFeat.unsqueeze(0), SupportLabel.unsqueeze(0)
 
-            clsScore = self.netSIB(lr, SupportFeat, SupportLabel, QueryFeat)
+            clsScore = self.netSIB(SupportFeat, SupportLabel, QueryFeat, lr)
             clsScore = clsScore.view(QueryFeat.shape[0] * QueryFeat.shape[1], -1)
             QueryLabel = QueryLabel.view(-1)
             acc1 = accuracy(clsScore, QueryLabel, topk=(1,))
@@ -121,6 +167,16 @@ class Algorithm:
 
 
     def train(self, trainLoader, valLoader, lr=None, coeffGrad=0.0) :
+        """
+        Run one epoch on train-set.
+
+        :param trainLoader: the dataloader of train-set
+        :type trainLoader: class `TrainLoader`
+        :param valLoader: the dataloader of val-set
+        :type valLoader: class `ValLoader`
+        :param float lr: learning rate for synthetic GD
+        :param float coeffGrad: deprecated
+        """
         bestAcc, ci = self.validate(valLoader, lr)
         self.logger.info('Acc improved over validation set from 0% ---> {:.3f} +- {:.3f}%'.format(bestAcc,ci))
 
@@ -151,7 +207,7 @@ class Algorithm:
 
             self.optimizer.zero_grad()
 
-            clsScore = self.netSIB(lr, SupportFeat, SupportLabel, QueryFeat)
+            clsScore = self.netSIB(SupportFeat, SupportLabel, QueryFeat, lr)
             clsScore = clsScore.view(QueryFeat.shape[0] * QueryFeat.shape[1], -1)
             QueryLabel = QueryLabel.view(-1)
 

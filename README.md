@@ -20,10 +20,13 @@ If our code is helpful for your research, please consider citing:
 
 
 ## Dependencies
-The code is tested under **Pytorch > 1.0 + Python 3.6** environment. 
+The code is tested under **Pytorch > 1.0 + Python 3.6** environment with extra packages:
+``` Bash
+pip install -r requirements
+```
 
 
-## How to use the code
+## How to use the code on Mini-ImageNet?
 ### **Step 0**: Download Mini-ImageNet dataset
 
 ``` Bash
@@ -45,9 +48,16 @@ python main_feat.py --outDir miniImageNet_WRN_60Epoch --cuda --dataset miniImage
 python main.py --config config/miniImageNet_1shot.yaml --seed 100 --gpu 0
 ```
 
-## Mini-ImageNet Results
+## Mini-ImageNet Results (LAST ckpt)
 
 | Setup         | 5-way-1-shot  | 5-way-5-shot |
 | ------------- | -------------:| ------------:|
 | SIB (K=3)     | 70.700% ± 0.585% | 80.045% ± 0.363%|
 | SIB (K=5)     | 70.494 ± 0.619% | 80.192% ± 0.372%|
+
+## CIFAR-FS Results (LAST ckpt)
+
+| Setup         | 5-way-1-shot  | 5-way-5-shot |
+| ------------- | -------------:| ------------:|
+| SIB (K=3)     | 79.763% ± 0.577% | 85.721% ± 0.369%|
+| SIB (K=5)     | 79.627 ± 0.593% | 85.590% ± 0.375%|
