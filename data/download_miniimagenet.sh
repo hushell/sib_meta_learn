@@ -16,4 +16,5 @@ mv val1000Episode_5_way_1_shot.json Mini-ImageNet/
 wget https://www.dropbox.com/s/t36y8ng47wlcxw0/netFeatBest64.653.pth?dl=0
 mv netFeatBest64.653.pth?dl=0 netFeatBest64.653.pth
 mkdir ../ckpts
-mv netFeatBest64.653.pth ../ckpts/
+mkdir ../ckpts/Mini-ImageNet
+mv netFeatBest64.653.pth ../ckpts/Mini-ImageNet/
