@@ -22,7 +22,7 @@ If our code is helpful for your research, please consider citing:
 ## Dependencies
 The code is tested under **Pytorch > 1.0 + Python 3.6** environment with extra packages:
 ``` Bash
-pip install -r requirements
+pip install -r requirements.txt
 ```
 
 
@@ -42,10 +42,16 @@ The weights of the feature network is downloaded in step 0, but you may also tra
 python main_feat.py --outDir miniImageNet_WRN_60Epoch --cuda --dataset miniImageNet --nbEpoch 60
 ```
 
-### **Step 2**: Few-shot classification on Mini-ImageNet, e.g., 5-way-1-shot:
+### **Step 2**: Meta-training on Mini-ImageNet, e.g., 5-way-1-shot:
 
 ``` Bash
 python main.py --config config/miniImageNet_1shot.yaml --seed 100 --gpu 0
+```
+
+### **Step 3**: Meta-testing on Mini-ImageNet with a checkpoint:
+
+``` Bash
+python main.py --config config/miniImageNet_1shot.yaml --seed 100 --gpu 0 --ckpt cache/miniImageNet_1shot_K3_seed100/outputs_xx.xxx/netSIBBestxx.xxx.pth
 ```
 
 ## Mini-ImageNet Results (LAST ckpt)

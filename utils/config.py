@@ -76,7 +76,7 @@ def get_args():
     argparser.add_argument(
         '-c', '--config',
         metavar='C',
-        default='None',
+        default=None,
         help='The Configuration file')
     argparser.add_argument(
         '-k', '--steps',
@@ -94,9 +94,9 @@ def get_args():
         type=int,
         help='GPU id')
     argparser.add_argument(
-        '--test',
-        action='store_true',
-        help='whether test a ckpt')
+        '--ckpt',
+        default=None,
+        help='The path to ckpt')
     args = argparser.parse_args()
     return args
 
@@ -123,7 +123,8 @@ def get_config():
     config.nStep = args.steps
     config.seed = args.seed
     config.gpu = args.gpu
-    config.test = args.test
+    config.test = False if args.ckpt is None else True
+    config.ckptPth = args.ckpt
 
     # create directories
     config.cacheDir = os.path.join("cache", '{}_{}shot_K{}_seed{}'.format(

@@ -128,11 +128,11 @@ if not args.test:
 
 #############################################################################################
 ## Testing
-print ('Testing model {}...'.format(args.ckptPth if args.test else 'LAST'))
+logger.info('Testing model {}...'.format(args.ckptPth if args.test else 'LAST'))
 mean, ci95 = alg.validate(testLoader, mode='test')
 
 if not args.test:
-    print ('Testing model BEST...')
+    logger.info('Testing model BEST...')
     alg.load_ckpt(os.path.join('{}_{:.3f}'.format(args.outDir, bestAcc),
                                'netSIBBest{:.3f}.pth'.format(bestAcc)))
     mean, ci95 = alg.validate(testLoader, mode='test')

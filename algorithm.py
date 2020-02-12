@@ -48,6 +48,9 @@ class Algorithm:
         self.nFeat = args.nFeat
         self.batchSize = args.batchSize
         self.nEpisode = args.nEpisode
+        self.momentum = args.momentum
+        self.weightDecay = args.weightDecay
+
         self.logger = logger
         self.device = torch.device('cuda' if args.cuda else 'cpu')
 
@@ -59,9 +62,9 @@ class Algorithm:
                 param = torch.load(args.resumeFeatPth, map_location='cpu')
             self.netFeat.load_state_dict(param)
             msg = '\nLoading netFeat from {}'.format(args.resumeFeatPth)
-            logger.info(msg)
+            self.logger.info(msg)
 
-        if args.ckptPth:
+        if args.test:
             self.load_ckpt(args.ckptPth)
 
 
@@ -78,11 +81,11 @@ class Algorithm:
         lr = param['lr']
         self.optimizer = torch.optim.SGD(itertools.chain(*[self.netSIB.parameters(),]),
                                          lr,
-                                         momentum=args.momentum,
-                                         weight_decay=args.weightDecay,
+                                         momentum=self.momentum,
+                                         weight_decay=self.weightDecay,
                                          nesterov=True)
         msg = '\nLoading networks from {}'.format(ckptPth)
-        logger.info(msg)
+        self.logger.info(msg)
 
 
     def compute_grad_loss(self, clsScore, QueryLabel):

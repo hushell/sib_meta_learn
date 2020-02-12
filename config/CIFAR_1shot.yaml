@@ -7,7 +7,7 @@ dataset: 'Cifar' # choices = ['miniImageNet', 'Cifar']
 # Network
 nStep: 3 # number of synthetic gradient steps
 architecture: 'WRN_28_10'  # choices = ['WRN_28_10', 'Conv64_4']
-batchSize: 8 # number of episodes in each batch
+batchSize: 1 # number of episodes in each batch
 
 # Optimizer
 lr: 0.001 # lr is fixed
@@ -20,7 +20,6 @@ nbIter: 50000 # number of training iterations
 seed: 100 # can be reset with --seed
 gpu: '1' # can be reset with --gpu
 resumeFeatPth : './ckpts/CIFAR-FS/netFeatBest62.561.pth' # feat ckpt
-ckptPth: ''  # model ckpt for finetuning
 coeffGrad: 0 # grad loss coeff
 
 # Testing
