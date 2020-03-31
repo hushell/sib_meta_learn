@@ -1,4 +1,4 @@
-#\[Update March 31st 2020\] This repository has been merged to [Xfer](https://github.com/amzn/xfer/tree/master/synthetic_info_bottleneck)
+# \[Update March 31st 2020\] This repository has been merged to [Xfer](https://github.com/amzn/xfer/tree/master/synthetic_info_bottleneck)
 
 # \[ICLR 2020\] Synthetic information bottleneck for transductive meta-learning
 This repo contains the implementation of the *synthetic information bottleneck* algorithm for few-shot classification on Mini-ImageNet,
